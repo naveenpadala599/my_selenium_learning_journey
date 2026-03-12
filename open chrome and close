@@ -1,0 +1,14 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+service=Service()
+driver=webdriver.Chrome(service=service)
+driver.maximize_window()
+print("Browser started")
+i=input("enter exit when you are ready to closer chrome: ")
+if i.lower()=="exit":
+   driver.quit()
