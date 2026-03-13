@@ -1,0 +1,18 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+service=Service()
+driver=webdriver.Chrome(service=service)
+driver.maximize_window()
+print("Browser started")
+driver.get("https://www.wikipedia.org")
+print("page_title:", driver.title)
+print("current_url:", driver.current_url)
+time.sleep(2)
+i=input("type 'exit' if you want to close the browser: ")
+if i.lower()=="exit":
+    driver.quit()
