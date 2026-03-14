@@ -1,0 +1,15 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+driver=webdriver.Chrome(service=Service())
+driver.maximize_window()
+print("browser started")
+driver.get("https://www.wikipedia.org")
+print("page title:",driver.title)
+print("current url:",driver.current_url)
+search_box=driver.find_element(By.ID,"searchInput")
+print("search box found")
