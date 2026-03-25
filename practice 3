@@ -49,6 +49,7 @@ try:
     print("clicked first link")
 except:
     print("clickable emement not found")
+driver.quit()
     
     
     
