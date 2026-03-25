@@ -1,0 +1,54 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.exceptions import NoSuchElementException, TimeoutException
+import time
+options=webdriver.ChromeOptions()
+driver=webdriver.Chrome(options=options)
+driver.maximize_window()
+wait=WebDriverWait(driver, 10)
+driver.get("https://www.wikipedia.org")
+print(driver.title)
+driver.refresh()
+driver.back()
+driver.forward()
+search_box=driver.find_element(By.ID, "searchInput")
+try:
+    driver.find_element(By.NAME, "search")
+    print("found by name")
+except:
+    print("name not found")
+try:
+    driver.find_element(By.CLASS_NAME, "central-featured")
+    print("found by class name")
+except:
+    print("class not found")
+search_box_xpath=driver.find_element(By.XPATH, "//input[@id='searchInput']")
+print("found by xpath")
+try:
+    driver.find_element(By.PARTIAL_LINK_TEXT, "English")
+    print("partial link text")
+except:
+    print("partial link not found")
+search_box.send_keys("selenium software")
+search_box.send_keys(Keys.ENTER)
+try:
+    heading=wait.until(EC.visibility_of_element_located((By.ID, "firstHeading")))
+    print(heading.text)
+    wait.until(EC.text_to_be_present_in_element((By.ID,"firstHeading"), "Selenium"))
+    print("text verified")
+except TimeoutException:
+    print("Element loading timeout")
+try:
+    clickable=wait.until(EC.element_to_be_clickable((By.XPATH, "//a")))
+    clickable.click()
+    print("clicked first link")
+except:
+    print("clickable emement not found")
+    
+    
+    
