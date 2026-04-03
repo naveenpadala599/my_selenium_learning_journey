@@ -1,0 +1,160 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# ==============================
+# EDIT THESE LATER
+USERNAME = ""
+PASSWORD = ""
+URL = "https://enprocess.writerinformation.com:4433/writer/ap_all/login.php"
+# ==============================
+
+driver = webdriver.Chrome(service=Service())
+driver.maximize_window()
+wait = WebDriverWait(driver, 20)
+
+# 1️⃣ Open login page
+driver.get(URL)
+
+# 2️⃣ Wait for Select2 dropdown to appear and click it
+select2_box = wait.until(
+    EC.element_to_be_clickable((By.CLASS_NAME, "select2-selection"))
+)
+select2_box.click()
+
+# 3️⃣ Type username in the search box that appears
+search_box = wait.until(
+    EC.presence_of_element_located((By.CLASS_NAME, "select2-search__field"))
+)
+search_box.send_keys(USERNAME)
+
+# Wait for dropdown results to load
+time.sleep(2)
+
+# Press ENTER to select first result
+search_box.send_keys(Keys.ENTER)
+
+# 4️⃣ Enter password
+password_box = wait.until(
+    EC.presence_of_element_located((By.NAME, "p"))
+)
+password_box.send_keys(PASSWORD)
+
+# 5️⃣ Click Login button
+login_button = wait.until(
+    EC.element_to_be_clickable((By.CLASS_NAME, "login100-form-bgbtn"))
+)
+login_button.click()
+
+print("Login attempted 🚀")
+# ==============================
+# AFTER LOGIN REDIRECT TO DASHBOARD
+# ==============================
+
+# 6️⃣ Wait until sidebar loads
+wait.until(
+    EC.presence_of_element_located((By.CLASS_NAME, "sidebar-menu"))
+)
+
+# 7️⃣ Click "SRO Image QC" parent menu
+sro_menu = wait.until(
+    EC.element_to_be_clickable((By.XPATH, "//span[text()='SRO Image QC']"))
+)
+sro_menu.click()
+
+# 8️⃣ Wait for dropdown animation to open
+time.sleep(1)
+
+# 9️⃣ Click "Image QC" submenu link
+image_qc_link = wait.until(
+    EC.element_to_be_clickable((By.XPATH, "//a[@href='year_wise_screen.php']"))
+)
+image_qc_link.click()
+
+# ==============================
+# CLICK YEAR 1992 ROW
+# ==============================
+
+# Wait until DataTable is loaded
+wait.until(
+    EC.presence_of_element_located((By.ID, "fileTable"))
+)
+
+# Find the row that contains text "1992"
+row_1992 = wait.until(
+    EC.element_to_be_clickable((By.XPATH, "//table[@id='fileTable']//tr[td[text()='1992']]"))
+)
+
+# Click the row
+row_1992.click()
+
+print("Opened year 1992 page 🚀")
+reject_reason = "scanning not done properly"
+
+print("Automation started...")
+
+while True:
+    try:
+        # ===============================
+        # 1️⃣ WAIT FOR PDF TO LOAD (iframe appears)
+        # ===============================
+        iframe = wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#viewer iframe"))
+        )
+
+        # Wait until iframe src is not empty and fully loaded
+        wait.until(lambda d: iframe.get_attribute("src") not in ["", None])
+
+        current_src = iframe.get_attribute("src")
+        print("PDF loaded:", current_src)
+
+        # small buffer (important for heavy PDFs)
+        time.sleep(2)
+
+        # ===============================
+        # 2️⃣ WAIT FOR REJECT BUTTON
+        # ===============================
+        reject_btn = wait.until(
+            EC.element_to_be_clickable((By.ID, "rejectActiveFile"))
+        )
+
+        time.sleep(1)
+        reject_btn.click()
+        print("Reject button clicked")
+
+        # ===============================
+        # 3️⃣ HANDLE PROMPT ALERT
+        # ===============================
+        alert = wait.until(EC.alert_is_present())
+
+        print("Prompt detected")
+        alert.send_keys(reject_reason)
+        alert.accept()
+        print("Reject reason submitted")
+
+        # ===============================
+        # 4️⃣ WAIT FOR NEXT DOCUMENT
+        # ===============================
+        print("Waiting for next document...")
+
+        wait.until(
+            lambda d: d.find_element(By.CSS_SELECTOR, "#viewer iframe")
+            .get_attribute("src") != current_src
+        )
+
+        print("Next document loaded")
+        print("------------------------------------------------")
+
+    except TimeoutException:
+        print("No more documents OR page stuck.")
+        break
+
+    except NoAlertPresentException:
+        print("Prompt not found. Retrying...")
+        time.sleep(3)
+
+input()
